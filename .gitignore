@@ -1,0 +1,16 @@
+# Ignore Python bytecode files
+__pycache__/
+*.pyc
+
+# Ignore virtual environments
+venv/
+
+# Ignore Docker-related files
+.docker/
+.dockerignore
+
+# Ignore IDE settings (VS Code, etc.)
+.vscode/
+.idea/
+#ignore the docker aws json
+Dockerrun.aws.json
