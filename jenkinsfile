@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        DOCKER_IMAGE = 'your_dockerhub_username/flasksqlgif'
+        DOCKER_IMAGE = 'yuvalbenar/flasksqlgif'
         GITHUB_REPO = 'https://github.com/yuvalbenar/flasksqlgif.git'
         DOCKER_REGISTRY = 'docker.io'
     }
@@ -32,7 +32,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    docker.withRegistry('', 'dockerhub_credentials') {
+                    docker.withRegistry('', 'yuvalbenar') {
                         docker.image("$DOCKER_IMAGE").push()
                     }
                 }
