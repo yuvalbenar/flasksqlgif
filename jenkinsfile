@@ -1,40 +1,39 @@
 pipeline {
     agent any
     environment {
+        DOCKER_IMAGE = 'your_dockerhub_username/flasksqlgif'
         GITHUB_REPO = 'https://github.com/yuvalbenar/flasksqlgif.git'
+        DOCKER_REGISTRY = 'docker.io'
     }
 
     stages {
-        stage('Checkout Code') {
+        stage('Clone Code') {
             steps {
-                // Checkout the 'test' branch explicitly
-                git branch: 'test', url: "$GITHUB_REPO"
+                git url: "$GITHUB_REPO"
             }
         }
-
         stage('Build') {
             steps {
                 script {
-                    docker.build("your_dockerhub_username/flasksqlgif")
+                    docker.build("$DOCKER_IMAGE")
                 }
             }
         }
-
         stage('Test') {
             steps {
                 script {
-                    docker.image("your_dockerhub_username/flasksqlgif").inside('-e FLASK_ENV=development -e PORT=5000') {
+                    def app = docker.image("$DOCKER_IMAGE")
+                    app.inside("-e FLASK_ENV=development -e PORT=5000") {
                         sh 'python -m unittest discover tests/'
                     }
                 }
             }
         }
-
         stage('Deploy') {
             steps {
                 script {
                     docker.withRegistry('', 'dockerhub_credentials') {
-                        docker.image("your_dockerhub_username/flasksqlgif").push()
+                        docker.image("$DOCKER_IMAGE").push()
                     }
                 }
             }
