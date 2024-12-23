@@ -1,5 +1,5 @@
-DATABASE_HOST=gif-db
-DATABASE_PORT=3306
+DATABASE_HOST=gig-db
+DATABASE_PORT=3308
 DATABASE_USER=root            # root or any user you prefer
 DATABASE_PASSWORD=password    # MySQL root password
 DATABASE_NAME=flaskdb         # The name of your database

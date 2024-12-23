@@ -12,10 +12,11 @@ app = Flask(__name__)
 # Database connection function
 def get_db_connection():
     connection = mysql.connector.connect(
-        host=os.getenv('DATABASE_HOST'),  # Host from environment variable
-        user=os.getenv('DATABASE_USER'),  # User from environment variable
-        password=os.getenv('DATABASE_PASSWORD'),  # Password from environment variable
-        database=os.getenv('DATABASE_NAME')  # Database name from environment variable
+        host=os.getenv('DATABASE_HOST', 'gif-db'),  # Ensure it uses gif-db
+        port=os.getenv('DATABASE_PORT', 3308),
+        user=os.getenv('DATABASE_USER', 'root'),
+        password=os.getenv('DATABASE_PASSWORD', 'password'),
+        database=os.getenv('DATABASE_NAME', 'flaskdb')
     )
     return connection
 
