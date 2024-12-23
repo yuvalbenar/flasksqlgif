@@ -1,4 +1,4 @@
-#import os
+import os  # Add this line to import the os module
 import mysql.connector
 import random
 import time
@@ -52,6 +52,7 @@ def index():
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=int(os.getenv('PORT', 5000)))
+
 
 
 # from flask import Flask, render_template
