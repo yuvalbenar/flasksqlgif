@@ -2,7 +2,7 @@ import unittest
 import os
 from flask import Flask
 from app import app, get_db_connection
-from unittest.mock import patch, MagicMock
+import mysql.connector
 
 class FlaskTestCase(unittest.TestCase):
 
@@ -13,28 +13,28 @@ class FlaskTestCase(unittest.TestCase):
             self.assertEqual(response.status_code, 200)  # Ensure it returns HTTP 200
             self.assertIn(b'Beagle of the Day', response.data)  # Ensure the content is correct
 
-    # Test the database connection function
-    @patch('app.get_db_connection')  # Mocking the get_db_connection function
-    def test_db_connection(self, mock_get_db_connection):
-        # Mock the database connection
-        mock_connection = MagicMock()
-        mock_get_db_connection.return_value = mock_connection
+    # Test the database connection function (real DB connection)
+    def test_db_connection(self):
+        try:
+            connection = get_db_connection()  # This should connect to gif-db container
+            self.assertIsNotNone(connection)  # Ensure connection is established
+            connection.close()  # Close the connection
+        except mysql.connector.Error as err:
+            self.fail(f"Error connecting to MySQL: {err}")
 
-        connection = get_db_connection()
-        self.assertIsNotNone(connection)  # Ensure connection is established (mocked)
-        mock_connection.close.assert_called_once()  # Ensure the connection's close method is called
-
-    # Test if the random image URL starts with "http"
+    # Test if the random image URL starts with "http" (real DB query)
     def test_random_image(self):
-        # Mocking the database query to return a sample image URL
-        with patch('app.mysql.connector.connect') as mock_connect:
-            mock_cursor = MagicMock()
-            mock_cursor.fetchone.return_value = ('https://somegifurl.com/sample.gif',)
-            mock_connect.return_value.cursor.return_value = mock_cursor
-
-            with app.test_client() as c:
-                response = c.get('/')
-                self.assertIn(b'http', response.data)  # Check if the image URL starts with 'http'
+        try:
+            connection = get_db_connection()
+            cursor = connection.cursor()
+            cursor.execute("SELECT url FROM images ORDER BY RAND() LIMIT 1")
+            random_image = cursor.fetchone()
+            self.assertIsNotNone(random_image)  # Ensure we got a result
+            self.assertTrue(random_image[0].startswith('http'))  # Ensure the URL starts with 'http'
+            cursor.close()
+            connection.close()
+        except mysql.connector.Error as err:
+            self.fail(f"Error querying the database: {err}")
 
 if __name__ == '__main__':
     unittest.main()
